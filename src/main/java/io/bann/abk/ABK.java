@@ -19,14 +19,16 @@ public class ABK {
         this.logger.info("Loading configuration");
         this.config = ConfigFactory.load();
         this.logger.info("Initializing receiver factory");
-        this.receiverFactory = new ReceiverFactory(this.config.getConfig("receiver"));
+        this.receiverFactory = new ReceiverFactory(this.config.getConfig("receiver"), this::handleMessage);
+    }
+
+    public void handleMessage(String str) {
+        System.out.println(str);
     }
 
     public void startMessageLoop() {
         this.logger.info("Starting message loop");
-        for (int i = 0; i < 100; i++) {
-            System.out.println(this.receiverFactory.getNextMessage());
-        }
+        this.receiverFactory.start();
         this.logger.info("Ending message loop");
     }
 

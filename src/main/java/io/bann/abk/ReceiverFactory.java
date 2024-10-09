@@ -5,6 +5,7 @@ import io.bann.abk.receiver.AbstractReceiver;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,20 +27,20 @@ public class ReceiverFactory {
         return Optional.empty();
     }
 
-    public String getNextMessage() {
-        if (this.receiver == null) {
-            this.logger.severe("Receiver was not initialized, shutting down!");
-            System.exit(-1);
-        }
-        return receiver.getNextMessage();
-    }
-
-    public ReceiverFactory(Config receiverConfig) {
+    public ReceiverFactory(Config receiverConfig, Consumer<String> handler) {
         this.logger = Logger.getLogger(this.getClass().getCanonicalName());
         loadReceiver(receiverConfig.getString("class")).ifPresentOrElse(r -> this.receiver = r, () -> {
             System.exit(-1);
         });
-        this.receiver.configure(receiverConfig);
+        this.receiver.configure(receiverConfig, handler);
+    }
+
+    public void start() {
+        this.receiver.start();
+    }
+
+    public void end() {
+        this.receiver.end();
     }
 
 }
